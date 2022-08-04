@@ -375,12 +375,34 @@ curl --socks5 localhost:8080 http://www.baidu.com
 ps [-aefFly] [-p pid] [-u userid]
 # -a：与任何用户标识和终端相关的进程
 # -e：所有进程（包括守护进程）
-# -ef：显示所有用户进程，完整输出
+# -ef：显示所有用户进程，完整输出。等价于 aux
 # -t：仅显示所有守护进程
-
+# -x：显示没有控制终端(TTY)的进程
 # -p：pid 与指定PID相关的进程
 # -u：userid 与指定用户标识userid相关的进程
 ```
+
+```bash
+ps aux # 如下结果：
+
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0    896   532 ?        Sl   04:10   0:00 /init
+root         8  0.0  0.0    896    88 ?        Ss   04:10   0:00 /init
+
+# USER：哪个用户创建的
+# PID：进程号
+# %CPU：CPU占用率
+# %MEM：内存占用率
+# VSZ：虚拟地址
+# RSS：空闲地址
+# TTY：终端（如：vim、ps、pts/22）
+# STAT：状态
+# START：起始时间
+# TIME：运行时间
+# COMMAND：命令
+```
+
+
 
 ## netstat
 
@@ -443,44 +465,6 @@ upx agilor.exe -o agilor-hub.exe
 # 循环执行某一操作
 while true;do curl http://localhost:81;sleep 1;done; # 循环访问81操作，每秒访问一次
 ```
-
-
-
-# 编译工具
-
-## gcc
-
-`GNU` 编译器套件，可编译 `c、c++、objective-c、fortran、java` 等
-
-编译单个文件 ok，如果要编译多个文件，只能用 `make` 工具
-
-## make
-
-本身不具备编译链接功能，而是类似批处理方式一通调用 `makefile` 文件中的命令进行编译和链接
-
-## makefile
-
-包含调用 `gcc` (也可以是别的编译器) 去编译源文件的命令，但换个平台又要重新修改 `makefile`，此时就要用 `cmake`
-
-## cmake
-
-可以更加简单的==根据 CMakeList.txt 跨平台==生成 `makefile` 给 `make` 用。
-
-## CMakeLists.txt
-
-手写该文件给 `cmake` 用
-
-## nmake
-
-是 `visual studio` 中的附带命令，需要安装vs，相当于 `make`
-
-# 库文件类型
-
-**.o：**目标文件，相当于 win 下的 .obj 文件
-
-**.so：**动态库，相当于 win 下的 .dll
-
-**.a：**静态库，多个 .o 合在一起用于静态链接
 
 # ==填坑==
 

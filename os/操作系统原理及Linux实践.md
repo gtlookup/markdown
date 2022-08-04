@@ -219,107 +219,14 @@ CPU利用率：CPU的忙碌程度
 
 时间片轮转（ROUND ROBIN）：抢占式调度，每个进程都可以得到相同的CPU时间，当时间片到达，进程将被剥夺CPU并加入就绪队列尾部
 
+## 系统调用与库函数
 
+linux 下文件操作两种方式：
 
-# Api
-
-所有的api可通过`man`查看用法及包含的头文件
-
-## 进程
-
-### getpid
-
-返回当前进程号。rust：`unsafe { libc::getpid() }`
-
-### fork
-
-创建一个当前进程的子进程，成功返回 pid，失败则返回-1，被创建的子进程返回 0。rust：`unsafe { libc::fork() }`
-
-fork 后的父子进程是异步执行的
-
-windows下调该方法报错，因为没有
-
-```rust
-unsafe {
-    println!("before fork pid: {}", libc::getpid());
-    let cid: libc::c_int = libc::fork();
-    println!("cid: {}", cid);
-    println!("after fork pid: {}", libc::getpid());
-    libc::wait(std::ptr::null_mut()); // 等待子进程结束，c里的 NULL == std::ptr::null_mut()
-} // 结果：
-// before fork pid: 563 父进程的结果
-// cid: 584             父进程的结果，正常返回pid
-// after fork pid: 563  父进程的结果
-// cid: 0               子进程的结果，返回 0
-// after fork pid: 584  子进程的结果
-```
-
-#### 孤儿进程
-
-当父进程 fork 了个子进程后就结束了，但子进程还没结束，此时子进程就成了**孤儿进程**。
-
-孤儿进程会托管给系统进程（pid=1）
-
-### wait
-
-等待fork的子进程结束，`wait(NULL)` == `libc::wait(std::ptr::null_mut())`
-
-### sleep
-
-`sleep(3)` 睡3秒
-
-## 线程
-
-### pthread_create
-
-创建一个线程，创建成功后x86_64默认分配2M的栈大小
-
-==注意==：由于 `pthread` 不是 linux 系统默认库，连接时需要静态库 `libpthread.a`，所以编译时要加 ==`-lpthread`或`-pthread(推荐)`==，如：
-
-==`gcc thr.c -o thr -pthread`==
-
-```c
-// 返回值：成功0，失败返回错误码
-int pthread_create(
-    pthread_t *thread,               // 成功后返回thread id
-    const pthread_attr_t *attr,      // 线程属性，可以给NULL
-    void *(*start_routine) (void *), // 执行线程的函数指针
-    void *arg                        // 传给线程的参数，可以给NULL
-);
-```
-
-### pthread_join
-
-等待线程结束
-
-```c
-// 成功返回0，失败返回错误号
-int pthread_join(pthread_t thread, void **retval); // arg1：要等待的线程id，arg2：可以NULL
-```
-
-### pthread_exit
-
-`pthread_exit(0);` 正常结束返回一个线程
-
-### 例子
-
-> 创建、等待、传参
-
-```c
-#include <stdio.h>
-#include <pthread.h>
-
-void* fn(void* arg) {
-    printf("thread run fn, paramter: %d\n", *((int*)arg));
-}
-
-int main() {
-    int p = 7;
-    pthread_t tid;
-    pthread_create(&tid, NULL, fn, (void*)&p);
-    pthread_join(tid, NULL); // 结果：thread run fn, paramter: 7
-}
-```
+- 系统调用(system call)
+- 库函数调用(library functions)：也有两部分组成
+  - 不需要系统调用：不需要切换到内核态就能完成全部功能。如：strcpy、bzero 等字符串函数
+  - 需要系统调用：需要切换到内核态，这类函数通过封装系统调用去实现功能。如：printf、fread等
 
 
 

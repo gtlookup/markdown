@@ -86,7 +86,7 @@ ulimit -a # 执行后结果如下
 core file size          (blocks, -c) unlimited
 data seg size           (kbytes, -d) unlimited
 scheduling priority             (-e) 0
-file size               (blocks, -f) unlimited
+file size               (blocks, -f) unlimited  # 文件大小没限制
 pending signals                 (-i) 7185
 max locked memory       (kbytes, -l) 64
 max memory size         (kbytes, -m) unlimited
@@ -94,7 +94,7 @@ open files                      (-n) 1024       # 这里默认太小了
 pipe size            (512 bytes, -p) 8
 POSIX message queues     (bytes, -q) 819200
 real-time priority              (-r) 0
-stack size              (kbytes, -s) 8192
+stack size              (kbytes, -s) 8192       # 每个进程栈8M
 cpu time               (seconds, -t) unlimited
 max user processes              (-u) unlimited
 virtual memory          (kbytes, -v) unlimited
@@ -124,6 +124,7 @@ man man # 查看man命令的帮助
 man cat
 man printf # 查看系统api函数
 man abs    # 查看系统api函数
+man ascii  # 查看 ascii 码
 ```
 
 # objdump
@@ -363,11 +364,82 @@ ln 源文件 链接文件    # 硬链接
   :!man printf # 直接在vim里查看printf，按q退出，再回车回到vim
   :r !ls # 将ls结果写到当前光标下方，!ls 可以是任何命令
   :r 文件路径  # 将指定文件的内容写到当前光标下方
-  :w 文件路径  # 将当前文件内容写入到另一个文件
+  :w 文件路径  # 将当前文件内容写入到另一个文件（另存为）
   :w! 文件路径 # 强制将当前文件内容写入到另一个文件（比如目标文件已存在，要加w!）
   ```
   
-  
+
+## tab键空格数
+
+编辑模式下tab键默认是8个空格，有两种设置成4空格方式：
+
+1. 临时设置：
+
+   ```bash
+   :set ts=4 # 直接在末尾模式输入，但再次启动vim时又会变成8空格
+   ```
+
+2. 永久设置：在 `/etc/vim/vimrc` 最下面加上 `set ts=4`
 
 
+# wc
+
+统计行数、字数、字节数：
+
+- -c：统计字节数
+- -m：统计字符数
+- -l：统计行数
+- -w：统计字数
+
+```bash
+wc -cmlw [文件名]
+echo "大" | wc -c # 结果：2
+echo "大" | wc -m # 结果：4
+```
+
+# nc
+
+用于发送和接收TCP/UDP消息
+
+1）连接：
+
+2）监听：`nc -l -p port [-options] [hostname] [port]`
+
+- -l：监听模式
+- -p：监听的端口
+
+https://www.bilibili.com/video/BV14341187xw/?spm_id_from=333.788.recommend_more_video.1&vd_source=e611dc7ed99505a0ef548dd66f0a11dd
+
+# bash udp
+
+```bash
+# 向 localhost:9999 发送 haha 数据。连接成功显示ok，失败no
+echo haha > /dev/udp/localhost/9999 && echo ok || echo no
+```
+
+# stat
+
+```bash
+stat 文件名 # 查看文件详细信息
+```
+
+# kill
+
+```bash
+kill [信号] pid
+```
+
+信号：从 0 ~ 15，9为结对终止
+
+- -18：唤醒
+- -19：挂起
+
+# killall
+
+根据名称杀掉所有同名进程
+
+```bash
+sleep 3000 &  # 执行多次后用 ps -a 查看
+killall sleep # 再次 ps -a
+```
 
